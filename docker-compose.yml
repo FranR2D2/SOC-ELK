@@ -5,7 +5,7 @@ services:
     container_name: soc-elasticsearch
     environment:
       - discovery.type=single-node
-      - ELASTIC_PASSWORD=SOCelk2024!
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
       - xpack.security.enabled=true
       - xpack.security.http.ssl.enabled=false
       - bootstrap.memory_lock=true
@@ -41,7 +41,7 @@ services:
     container_name: soc-logstash
     environment:
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
-      - ELASTIC_PASSWORD=SOCelk2024!
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
       - "LS_JAVA_OPTS=-Xms1g -Xmx1g"
     volumes:
       - ./logstash/pipeline:/usr/share/logstash/pipeline
