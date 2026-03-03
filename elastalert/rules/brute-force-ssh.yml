@@ -1,0 +1,46 @@
+# ─────────────────────────────────────────
+# REGLA: Detección de Brute Force SSH
+# MITRE: T1110 - Brute Force
+# ─────────────────────────────────────────
+name: Brute Force SSH Detection
+type: frequency
+
+# Fuente de datos
+index: soc-logs-*
+timestamp_field: "@timestamp"
+
+# Condición: más de 5 intentos fallidos
+# en menos de 1 minuto desde la misma IP
+num_events: 5
+timeframe:
+  minutes: 1
+
+# Qué buscar en los logs
+filter:
+  - query:
+      match_phrase:
+        message: "Failed password"
+
+# Qué mostrar en la alerta
+alert_text: |
+  ⚠️  ALERTA: Brute Force SSH Detectado
+  ────────────────────────────────────
+  Regla:     Brute Force SSH Detection
+  MITRE:     T1110 - Brute Force
+  Severidad: ALTA
+  
+  Se detectaron {0} intentos fallidos de
+  autenticación SSH en menos de 1 minuto.
+  
+  Acción recomendada:
+  1. Identificar IP atacante en los logs
+  2. Bloquear IP en el firewall
+  3. Verificar si hubo acceso exitoso
+  4. Abrir ticket de incidente
+
+alert_text_args:
+  - num_hits
+
+# Tipo de alerta (guardamos en log por ahora)
+alert:
+  - debug

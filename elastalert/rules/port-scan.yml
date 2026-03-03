@@ -1,0 +1,41 @@
+# ─────────────────────────────────────────
+# REGLA: Detección de Port Scan
+# MITRE: T1046 - Network Service Discovery
+# ─────────────────────────────────────────
+name: Port Scan Detection
+type: frequency
+
+index: soc-logs-*
+timestamp_field: "@timestamp"
+
+num_events: 10
+timeframe:
+  seconds: 30
+
+filter:
+  - query:
+      match_phrase:
+        message: "DROP"
+
+alert_text: |
+  ⚠️  ALERTA: Port Scan Detectado
+  ────────────────────────────────────
+  Regla:     Port Scan Detection
+  MITRE:     T1046 - Network Service Discovery
+  Severidad: MEDIA
+
+  Se detectaron {0} paquetes bloqueados
+  en menos de 30 segundos.
+
+  Acción recomendada:
+  1. Identificar IP origen del escaneo
+  2. Verificar qué puertos está buscando
+  3. Correlacionar con otros eventos de esa IP
+  4. Bloquear IP si el escaneo es agresivo
+  5. Abrir ticket de incidente
+
+alert_text_args:
+  - num_hits
+
+alert:
+  - debug

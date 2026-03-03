@@ -1,0 +1,35 @@
+# ─────────────────────────────────────────
+# REGLA: Detección de SQL Injection
+# MITRE: T1190 - Exploit Public Application
+# ─────────────────────────────────────────
+name: SQL Injection Detection
+type: any
+
+index: soc-logs-*
+timestamp_field: "@timestamp"
+
+filter:
+  - query:
+      match_phrase:
+        message: "sqlmap"
+
+alert_text: |
+  ⚠️  ALERTA: SQL Injection Detectado
+  ────────────────────────────────────
+  Regla:     SQL Injection Detection
+  MITRE:     T1190 - Exploit Public Application
+  Severidad: ALTA
+
+  Se detectó uso de sqlmap contra
+  un servidor web.
+
+  Acción recomendada:
+  1. Identificar IP atacante
+  2. Ver qué URLs está atacando
+  3. Verificar si hay datos comprometidos
+  4. Bloquear IP en el WAF/Firewall
+  5. Revisar logs del servidor web
+  6. Abrir ticket de incidente
+
+alert:
+  - debug

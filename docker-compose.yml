@@ -1,0 +1,59 @@
+services:
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.12.0
+    container_name: soc-elasticsearch
+    environment:
+      - discovery.type=single-node
+      - ELASTIC_PASSWORD=SOCelk2024!
+      - xpack.security.enabled=true
+      - xpack.security.http.ssl.enabled=false
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms2g -Xmx2g"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    ports:
+      - "9200:9200"
+    networks:
+      - soc-net
+    restart: unless-stopped
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.12.0
+    container_name: soc-kibana
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - ELASTICSEARCH_USERNAME=kibana_system
+      - ELASTICSEARCH_PASSWORD=SOCelk2024!
+      - XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY=SOCelkEncryptionKey2024!!32chars
+    ports:
+      - "5601:5601"
+    networks:
+      - soc-net
+    depends_on:
+      - elasticsearch
+    restart: unless-stopped
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:8.12.0
+    container_name: soc-logstash
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - ELASTIC_PASSWORD=SOCelk2024!
+      - "LS_JAVA_OPTS=-Xms1g -Xmx1g"
+    volumes:
+      - ./logstash/pipeline:/usr/share/logstash/pipeline
+    ports:
+      - "5044:5044"
+      - "5514:5514/udp"
+    networks:
+      - soc-net
+    depends_on:
+      - elasticsearch
+    restart: unless-stopped
+
+networks:
+  soc-net:
+    driver: bridge
