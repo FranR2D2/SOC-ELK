@@ -1,0 +1,35 @@
+# ─────────────────────────────────────────
+# REGLA DLP: Exfiltración USB confirmada
+# MITRE: T1052 - Exfiltration over Physical Medium
+# ─────────────────────────────────────────
+name: DLP - Exfiltracion USB Confirmada
+type: any
+
+index: soc-logs-*
+timestamp_field: "@timestamp"
+
+filter:
+  - query:
+      match_phrase:
+        message: "EXFILTRACION_USB_CONFIRMADA"
+
+alert_text: |
+  🚨 ALERTA CRÍTICA DLP: Exfiltración por USB
+  ──────────────────────────────────────────────────
+  Regla:     DLP - Exfiltración USB Confirmada
+  MITRE:     T1052 - Exfiltration over Physical Medium
+  Severidad: CRÍTICA
+
+  Se detectó una copia masiva de datos a USB.
+  Posible exfiltración de información confidencial.
+
+  Acción recomendada:
+  1. BLOQUEAR el equipo inmediatamente
+  2. Confiscar el dispositivo USB
+  3. Identificar al usuario
+  4. Preservar evidencias forenses
+  5. Notificar a dirección y RRHH
+  6. Abrir incidente P1
+
+alert:
+  - debug

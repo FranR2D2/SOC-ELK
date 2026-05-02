@@ -1,0 +1,34 @@
+# ─────────────────────────────────────────
+# REGLA DLP: Dispositivo USB detectado
+# MITRE: T1052 - Exfiltration over Physical Medium
+# ─────────────────────────────────────────
+name: DLP - USB Detectado
+type: any
+
+index: soc-logs-*
+timestamp_field: "@timestamp"
+
+filter:
+  - query:
+      match_phrase:
+        message: "USB_DETECTADO"
+
+alert_text: |
+  🚨 ALERTA DLP: Dispositivo USB Conectado
+  ──────────────────────────────────────────────────
+  Regla:     DLP - USB Detectado
+  MITRE:     T1052 - Exfiltration over Physical Medium
+  Severidad: ALTA
+
+  Se detectó un dispositivo USB conectado
+  al equipo de un usuario.
+
+  Acción recomendada:
+  1. Identificar el usuario y equipo
+  2. Verificar qué archivos se copiaron
+  3. Confiscar el dispositivo si es necesario
+  4. Abrir ticket de incidente
+  5. Notificar a RRHH y dirección
+
+alert:
+  - debug

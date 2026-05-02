@@ -1,0 +1,33 @@
+# ─────────────────────────────────────────
+# REGLA DLP: Acceso fuera de horario laboral
+# MITRE: T1078 - Valid Accounts
+# ─────────────────────────────────────────
+name: DLP - Acceso Fuera de Horario
+type: any
+
+index: soc-logs-*
+timestamp_field: "@timestamp"
+
+filter:
+  - query:
+      match_phrase:
+        message: "ACCESO_NOCTURNO"
+
+alert_text: |
+  🚨 ALERTA DLP: Actividad Fuera de Horario Laboral
+  ──────────────────────────────────────────────────
+  Regla:     DLP - Acceso Fuera de Horario
+  MITRE:     T1078 - Valid Accounts
+  Severidad: MEDIA
+
+  Se detectó actividad de un usuario fuera
+  del horario laboral (22:00 - 06:00h)
+
+  Acción recomendada:
+  1. Identificar el usuario
+  2. Verificar si el acceso está justificado
+  3. Correlacionar con otros eventos del usuario
+  4. Contactar al usuario o su responsable
+
+alert:
+  - debug

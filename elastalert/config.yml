@@ -1,7 +1,7 @@
 es_host: localhost
 es_port: 9200
 es_username: elastic
-es_password: ${ELASTIC_PASSWORD}
+es_password: SOCelk2024!
 rules_folder: /home/fcercar/SOC-ELK/elastalert/rules
 run_every:
   minutes: 1

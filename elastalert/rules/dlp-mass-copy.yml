@@ -1,0 +1,34 @@
+# ─────────────────────────────────────────
+# REGLA DLP: Copia masiva de archivos sensibles
+# MITRE: T1048 - Exfiltration Over Alternative Protocol
+# ─────────────────────────────────────────
+name: DLP - Copia Masiva Archivos Sensibles
+type: any
+
+index: soc-logs-*
+timestamp_field: "@timestamp"
+
+filter:
+  - query:
+      match_phrase:
+        message: "COPIA_MASIVA_ARCHIVOS_SENSIBLES"
+
+alert_text: |
+  🚨 ALERTA DLP: Copia Masiva de Archivos Sensibles
+  ──────────────────────────────────────────────────
+  Regla:     DLP - Copia Masiva Archivos Sensibles
+  MITRE:     T1048 - Exfiltration
+  Severidad: ALTA
+
+  Un usuario está copiando masivamente archivos
+  sensibles (.pdf, .docx, .xlsx, etc.)
+
+  Acción recomendada:
+  1. Identificar el usuario y equipo afectado
+  2. Verificar si la copia está autorizada
+  3. Bloquear el equipo si es sospechoso
+  4. Abrir ticket de incidente
+  5. Notificar al responsable de RRHH
+
+alert:
+  - debug
