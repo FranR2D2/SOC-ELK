@@ -146,27 +146,31 @@ def detectar_transferencia_grande(archivos):
 
 def detectar_usb():
     """Detecta dispositivos USB y archivos copiados"""
-    usb_paths = ["/media", "/mnt"]
     dispositivos = []
     archivos_usb = []
 
-    for path in usb_paths:
-        if os.path.exists(path):
-            for usuario in os.listdir(path):
-                ruta_usuario = os.path.join(path, usuario)
-                if os.path.isdir(ruta_usuario):
-                    for d in os.listdir(ruta_usuario):
-                        ruta = os.path.join(ruta_usuario, d)
-                        if os.path.ismount(ruta):
-                            dispositivos.append(ruta)
-                            # Escanear archivos en el USB
-                            archivos_usb.extend(escanear_directorio(ruta))
-                elif os.path.ismount(ruta_usuario):
-                    dispositivos.append(ruta_usuario)
-                    archivos_usb.extend(escanear_directorio(ruta_usuario))
+    # Buscar todos los puntos de montaje bajo /media y /mnt
+    for base in ["/media", "/mnt"]:
+        if not os.path.exists(base):
+            continue
+        # Comprobar el propio directorio
+        if os.path.ismount(base):
+            dispositivos.append(base)
+            archivos_usb.extend(escanear_directorio(base))
+        # Comprobar subdirectorios directos
+        for entry in os.listdir(base):
+            ruta = os.path.join(base, entry)
+            if os.path.ismount(ruta):
+                dispositivos.append(ruta)
+                archivos_usb.extend(escanear_directorio(ruta))
+            elif os.path.isdir(ruta):
+                for sub in os.listdir(ruta):
+                    sub_ruta = os.path.join(ruta, sub)
+                    if os.path.ismount(sub_ruta):
+                        dispositivos.append(sub_ruta)
+                        archivos_usb.extend(escanear_directorio(sub_ruta))
 
     if dispositivos:
-        # Calcular volumen total
         tamano_total = sum(a["tamano"] for a in archivos_usb)
         tamano_gb    = tamano_total / (1024**3)
         sensibles    = [a for a in archivos_usb if a["extension"] in EXTENSIONES_SENSIBLES]
@@ -177,9 +181,9 @@ def detectar_usb():
             severidad="MEDIA",
             descripcion=f"USB conectado: {len(archivos_usb)} archivos ({tamano_gb:.2f}GB)",
             detalles={
-                "dispositivos_usb":  dispositivos,
-                "num_archivos":      len(archivos_usb),
-                "tamano_gb":         round(tamano_gb, 3),
+                "dispositivos_usb":   dispositivos,
+                "num_archivos":       len(archivos_usb),
+                "tamano_gb":          round(tamano_gb, 3),
                 "archivos_sensibles": len(sensibles)
             }
         )
@@ -192,11 +196,11 @@ def detectar_usb():
                 severidad="CRITICA",
                 descripcion=f"⚠️ {tamano_gb:.2f}GB copiados al USB — posible exfiltración",
                 detalles={
-                    "dispositivos_usb":  dispositivos,
-                    "tamano_gb":         round(tamano_gb, 3),
-                    "num_archivos":      len(archivos_usb),
+                    "dispositivos_usb":   dispositivos,
+                    "tamano_gb":          round(tamano_gb, 3),
+                    "num_archivos":       len(archivos_usb),
                     "archivos_sensibles": len(sensibles),
-                    "extensiones":       list(set(a["extension"] for a in sensibles))
+                    "extensiones":        list(set(a["extension"] for a in sensibles))
                 }
             )
             enviar_alerta(evento2)
@@ -208,10 +212,10 @@ def detectar_usb():
                 severidad="ALTA",
                 descripcion=f"{len(sensibles)} archivos sensibles detectados en USB",
                 detalles={
-                    "dispositivos_usb":  dispositivos,
-                    "num_sensibles":     len(sensibles),
-                    "extensiones":       list(set(a["extension"] for a in sensibles)),
-                    "tamano_gb":         round(tamano_gb, 3)
+                    "dispositivos_usb": dispositivos,
+                    "num_sensibles":    len(sensibles),
+                    "extensiones":      list(set(a["extension"] for a in sensibles)),
+                    "tamano_gb":        round(tamano_gb, 3)
                 }
             )
             enviar_alerta(evento3)
